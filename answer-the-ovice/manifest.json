@@ -4,7 +4,7 @@
     "version": "1.0",
     "description": "Operates microphone mute in ovice.",
     "icons": {
-      "48": "image/icon_disable.png"
+      "48": "image/icon_on_green.png"
     },
     "action": {
       "default_icon": "image/icon_disable.png"
