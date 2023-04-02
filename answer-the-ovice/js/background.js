@@ -10,10 +10,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (!tab.url.startsWith("https://***.ovice.in/")) {
-      updateExtensionIconImpl(activeInfo.tabId, globalIconState);
-    }
+
+  getOveceUrl().then((oviceUrl) => {
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+      if (!tab.url.startsWith(oviceUrl)) {
+        updateExtensionIconImpl(activeInfo.tabId, globalIconState);
+      }
+    });
   });
 });
 
@@ -28,8 +31,27 @@ chrome.action.onClicked.addListener(async () => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'update_icon') {
     updateExtensionIcon(request.isOn, request.disabled);
+  } else if (request.message === 'reload_ovice_tabs') {
+    reloadOviceTabs();
   }
 });
+
+async function getSpaceDomain() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get("spaceDomain", (data) => {
+      if (data.spaceDomain) {
+        resolve(data.spaceDomain);
+      } else {
+        resolve(undefined);
+      }
+    });
+  });
+}
+
+async function getOveceUrl() {
+  const spaceDomain = await getSpaceDomain();
+  return `https://${spaceDomain}.ovice.in/`;
+}
 
 function sendCheckButtonMessage() {
   sendMessageToOviceTab({ message: "check_button" });
@@ -40,19 +62,21 @@ function sendClickButtonMessage() {
 }
 
 function sendMessageToOviceTab(message) {
-  chrome.tabs.query({}, function (tabs) {
-    for (const tab of tabs) {
-      if (tab.url.startsWith('https://***.ovice.in/')) {
-        chrome.tabs.sendMessage(tab.id, message, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError.message);
-          } else {
-            console.log("Message sent successfully");
-          }
-        });
-        return;
+  getOveceUrl().then((oviceUrl) => {
+    chrome.tabs.query({}, function (tabs) {
+      for (const tab of tabs) {
+        if (tab.url.startsWith(oviceUrl)) {
+          chrome.tabs.sendMessage(tab.id, message, (response) => {
+            if (chrome.runtime.lastError) {
+              console.error(chrome.runtime.lastError.message);
+            } else {
+              console.log("Message sent successfully");
+            }
+          });
+          return;
+        }
       }
-    }
+    });
   });
 }
 
@@ -88,10 +112,12 @@ function updateExtensionIconImpl(tabId, iconState) {
 }
 
 async function hasOviceTab() {
+  const oviceUrl = await getOveceUrl();
+
   return new Promise((resolve) => {
     chrome.tabs.query({}, (tabs) => {
       for (const tab of tabs) {
-        if (tab.url.startsWith("https://***.ovice.in/")) {
+        if (tab.url.startsWith(oviceUrl)) {
           resolve(true);
           return;
         }
@@ -100,4 +126,15 @@ async function hasOviceTab() {
     });
   });
 }
-  
+
+async function reloadOviceTabs() {
+  const oviceUrl = await getOveceUrl();
+
+  chrome.tabs.query({}, (tabs) => {
+    for (const tab of tabs) {
+      if (tab.url.startsWith(oviceUrl)) {
+        chrome.tabs.reload(tab.id);
+      }
+    }
+  });
+}

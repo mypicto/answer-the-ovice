@@ -10,6 +10,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+async function getSpaceDomain() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get("spaceDomain", (data) => {
+      if (data.spaceDomain) {
+        resolve(data.spaceDomain);
+      } else {
+        resolve("1epkepkzvz");
+      }
+    });
+  });
+}
+
+async function getOveceUrl() {
+  const spaceDomain = await getSpaceDomain();
+  return `https://${spaceDomain}.ovice.in/`;
+}
+
 function observeButton() {
   const targetNode = getTargetNode();
 
@@ -69,10 +86,14 @@ function sendMessageToBackground(message) {
   }
 }
 
-if (window.location.href.startsWith('https://***.ovice.in/')) {
-  observeButton();
-  checkButtonStatus();
-  window.addEventListener('focus', () => {
+getOveceUrl().then((oviceUrl) => {
+  console.log("start: " + oviceUrl);
+  if (window.location.href.startsWith(oviceUrl)) {
+    console.log("this is " + oviceUrl);
+    observeButton();
     checkButtonStatus();
-  });
-}
+    window.addEventListener('focus', () => {
+      checkButtonStatus();
+    });
+  }
+});
