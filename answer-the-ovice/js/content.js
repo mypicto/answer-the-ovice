@@ -1,6 +1,7 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'click_button') {
     clickButton();
+    sendResponse({});
   }
 });
 
@@ -47,6 +48,12 @@ function observePage() {
     };
     const observer = new MutationObserver(callback);
     observer.observe(targetNode, config);
+  }
+}
+
+function sendMessageToBackground(message) {
+  if (chrome.runtime) {
+    chrome.runtime.sendMessage(message);
   }
 }
 
