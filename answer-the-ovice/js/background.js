@@ -1,3 +1,4 @@
+let contentScriptReady = false;
 let globalIconState = {
   isOn: false,
   isDisabled: false,
@@ -11,7 +12,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (!isOviceUrl(tab.url)) {
+    if (!isOviceTab(tab)) {
       updateExtensionIconImpl(activeInfo.tabId, globalIconState);
     }
   });
@@ -33,9 +34,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-function isOviceUrl(url) {
+function isOviceTab(tab) {
   const oviceUrlPattern = /^https:\/\/[a-zA-Z0-9-]+\.ovice\.in\/.*$/;
-  return oviceUrlPattern.test(url);
+  const oviceLobbyPrefix = "https://app.ovice.in/"
+  let discarded = tab.discarded;
+  let isOviceUrl = oviceUrlPattern.test(tab.url);
+  let isLobbyUrl = tab.url.startsWith(oviceLobbyPrefix);
+
+  return !discarded && isOviceUrl && !isLobbyUrl;
 }
 
 function sendCheckButtonMessage() {
@@ -49,7 +55,7 @@ function sendClickButtonMessage() {
 function sendMessageToOviceTab(message) {
   chrome.tabs.query({}, function (tabs) {
     for (const tab of tabs) {
-      if (isOviceUrl(tab.url)) {
+      if (isOviceTab(tab)) {
         chrome.tabs.sendMessage(tab.id, message, (response) => {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError.message);
@@ -98,7 +104,7 @@ async function hasOviceTab() {
   return new Promise((resolve) => {
     chrome.tabs.query({}, (tabs) => {
       for (const tab of tabs) {
-        if (isOviceUrl(tab.url)) {
+        if (isOviceTab(tab)) {
           resolve(true);
           return;
         }
@@ -111,7 +117,7 @@ async function hasOviceTab() {
 async function reloadOviceTabs() {
   chrome.tabs.query({}, (tabs) => {
     for (const tab of tabs) {
-      if (isOviceUrl(tab.url)) {
+      if (isOviceTab(tab)) {
         chrome.tabs.reload(tab.id);
       }
     }
