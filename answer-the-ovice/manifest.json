@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "Answer the ovice",
+    "version": "1.0",
+    "description": "Operates microphone mute in ovice.",
+    "icons": {
+      "48": "image/icon_disable.png"
+    },
+    "action": {
+      "default_icon": "image/icon_disable.png"
+    },
+    "background": {
+      "service_worker": "js/background.js"
+    },
+    "permissions": ["activeTab", "scripting", "tabs"],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["js/content.js"]
+      }
+    ]
+}
