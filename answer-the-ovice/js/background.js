@@ -58,9 +58,7 @@ function sendMessageToOviceTab(message) {
       if (isOviceTab(tab)) {
         chrome.tabs.sendMessage(tab.id, message, (response) => {
           if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError.message);
-          } else {
-            console.log("Message sent successfully");
+            console.info(chrome.runtime.lastError.message);
           }
         });
         return;
@@ -122,4 +120,21 @@ async function reloadOviceTabs() {
       }
     }
   });
+}
+
+async function getSpaceDomain() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get("spaceDomain", (data) => {
+      if (data.spaceDomain) {
+        resolve(data.spaceDomain);
+      } else {
+        resolve(undefined);
+      }
+    });
+  });
+}
+
+async function getOveceUrl() {
+  const spaceDomain = await getSpaceDomain();
+  return `https://${spaceDomain}.ovice.in/`;
 }

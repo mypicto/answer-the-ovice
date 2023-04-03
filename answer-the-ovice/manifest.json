@@ -12,12 +12,13 @@
     "background": {
       "service_worker": "js/background.js"
     },
-    "permissions": ["activeTab", "scripting", "tabs"],
+    "permissions": ["activeTab", "scripting", "tabs", "storage"],
     "content_scripts": [
       {
         "matches": ["https://*.ovice.in/*"],
         "js": ["js/content.js"],
         "run_at": "document_idle"
       }
-    ]
+    ],
+    "options_page": "html/options.html"
 }

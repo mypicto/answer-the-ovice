@@ -34,7 +34,7 @@ function observeButton() {
         observeButton();
       }, 1000);
     } else {
-      console.error("Failed to find targetNode after 60 retries");
+      console.info("Failed to find targetNode after 60 retries");
     }
   }
 }
@@ -63,14 +63,37 @@ function getTargetNode() {
 
 function sendMessageToBackground(message) {
   if (chrome.runtime) {
-    chrome.runtime.sendMessage(message);
+    chrome.runtime.sendMessage(message, (response) => {
+      if (chrome.runtime.lastError) {
+        console.info(chrome.runtime.lastError.message);
+      }
+    });
   } else {
-    console.error('Extension context invalidated.');
+    console.info('Extension context invalidated.');
   }
 }
 
-observeButton();
-checkButtonStatus();
-window.addEventListener('focus', () => {
+async function getSpaceDomain() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get("spaceDomain", (data) => {
+      if (data.spaceDomain) {
+        resolve(data.spaceDomain);
+      } else {
+        resolve(undefined);
+      }
+    });
+  });
+}
+
+async function getOveceUrl() {
+  const spaceDomain = await getSpaceDomain();
+  return `https://${spaceDomain}.ovice.in/`;
+}
+
+if (!window.location.href.startsWith("https://app.ovice.in/")) {
+  observeButton();
   checkButtonStatus();
-});
+  window.addEventListener('focus', () => {
+    checkButtonStatus();
+  });
+}
