@@ -90,10 +90,12 @@ async function getOveceUrl() {
   return `https://${spaceDomain}.ovice.in/`;
 }
 
-if (!window.location.href.startsWith("https://app.ovice.in/")) {
-  observeButton();
-  checkButtonStatus();
-  window.addEventListener('focus', () => {
+getOveceUrl().then((oviceUrl) => {
+  if (window.location.href.startsWith(oviceUrl)) {
+    observeButton();
     checkButtonStatus();
-  });
-}
+    window.addEventListener('focus', () => {
+      checkButtonStatus();
+    });
+  }
+});

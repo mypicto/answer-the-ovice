@@ -3,6 +3,7 @@ let globalIconState = {
   isOn: false,
   isDisabled: false,
 };
+reloadOviceTabs();
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
@@ -11,10 +12,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (!isOviceTab(tab)) {
-      updateExtensionIconImpl(activeInfo.tabId, globalIconState);
-    }
+  getOveceUrl().then((oviceUrl) => {
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+      if (!isOviceTab(tab, oviceUrl)) {
+        updateExtensionIconImpl(activeInfo.tabId, globalIconState);
+      }
+    });
   });
 });
 
@@ -25,7 +28,13 @@ chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
 chrome.action.onClicked.addListener(async () => {
   sendClickButtonMessage();
 });
-  
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: '../html/options.html' });
+  }
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'update_icon') {
     updateExtensionIcon(request.isOn, request.disabled);
@@ -34,14 +43,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-function isOviceTab(tab) {
-  const oviceUrlPattern = /^https:\/\/[a-zA-Z0-9-]+\.ovice\.in\/.*$/;
-  const oviceLobbyPrefix = "https://app.ovice.in/"
+function isOviceTab(tab, oviceUrl) {
   let discarded = tab.discarded;
-  let isOviceUrl = oviceUrlPattern.test(tab.url);
-  let isLobbyUrl = tab.url.startsWith(oviceLobbyPrefix);
-
-  return !discarded && isOviceUrl && !isLobbyUrl;
+  let isOvice = tab.url.startsWith(oviceUrl);
+  return !discarded && isOvice;
 }
 
 function sendCheckButtonMessage() {
@@ -53,17 +58,19 @@ function sendClickButtonMessage() {
 }
 
 function sendMessageToOviceTab(message) {
-  chrome.tabs.query({}, function (tabs) {
-    for (const tab of tabs) {
-      if (isOviceTab(tab)) {
-        chrome.tabs.sendMessage(tab.id, message, (response) => {
-          if (chrome.runtime.lastError) {
-            console.info(chrome.runtime.lastError.message);
-          }
-        });
-        return;
+  getOveceUrl().then((oviceUrl) => {
+    chrome.tabs.query({}, function (tabs) {
+      for (const tab of tabs) {
+        if (isOviceTab(tab, oviceUrl)) {
+          chrome.tabs.sendMessage(tab.id, message, (response) => {
+            if (chrome.runtime.lastError) {
+              console.info(chrome.runtime.lastError.message);
+            }
+          });
+          return;
+        }
       }
-    }
+    });
   });
 }
 
@@ -100,25 +107,29 @@ function updateExtensionIconImpl(tabId, iconState) {
 
 async function hasOviceTab() {
   return new Promise((resolve) => {
-    chrome.tabs.query({}, (tabs) => {
-      for (const tab of tabs) {
-        if (isOviceTab(tab)) {
-          resolve(true);
-          return;
+    getOveceUrl().then((oviceUrl) => {
+      chrome.tabs.query({}, (tabs) => {
+        for (const tab of tabs) {
+          if (isOviceTab(tab, oviceUrl)) {
+            resolve(true);
+            return;
+          }
         }
-      }
-      resolve(false);
+        resolve(false);
+      });
     });
   });
 }
 
 async function reloadOviceTabs() {
-  chrome.tabs.query({}, (tabs) => {
-    for (const tab of tabs) {
-      if (isOviceTab(tab)) {
-        chrome.tabs.reload(tab.id);
+  getOveceUrl().then((oviceUrl) => {
+    chrome.tabs.query({}, (tabs) => {
+      for (const tab of tabs) {
+        if (isOviceTab(tab, oviceUrl)) {
+          chrome.tabs.reload(tab.id);
+        }
       }
-    }
+    });
   });
 }
 
