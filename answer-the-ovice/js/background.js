@@ -1,7 +1,7 @@
 let globalIconState = {
   isOn: false,
   isDisabled: false,
-};
+}
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
@@ -43,6 +43,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (var key in changes) {
+    if (key == 'systemLock') { // 変更を監視する設定名
+      chrome.runtime.reload(); // background.jsを再読み込み
+    }
+  }
+});
+
 //
 // PCがロックされたら離席
 //
@@ -56,7 +64,7 @@ function checkIdleState() {
       // 状態が変化した場合のみログを出力
       isCurrentStateLocked = isStateLocked;
       const currentDateTime = new Date().toLocaleString();
-      
+    
       if (isStateLocked) {
         console.log(`[${currentDateTime}] User is locked from the computer`);
         sendChangeLeavingMessage();
@@ -70,8 +78,14 @@ function checkIdleState() {
   setTimeout(checkIdleState, idleInterval * 1000);
 }
 
-// 最初の状態確認を開始
-checkIdleState();
+isSystemLock().then((isSystemLock) => {
+
+  console.log(`systemLock: ` + isSystemLock);
+  if (isSystemLock) {
+    // 最初の状態確認を開始
+    checkIdleState();
+  }
+});
 
 function isOviceTab(tab, oviceUrl) {
   let discarded = tab.discarded;
@@ -182,4 +196,16 @@ async function getSpaceDomain() {
 async function getOveceUrl() {
   const spaceDomain = await getSpaceDomain();
   return `https://${spaceDomain}.ovice.in/`;
+}
+
+async function isSystemLock() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get("systemLock", (data) => {
+      if (data.systemLock) {
+        resolve(data.systemLock);
+      } else {
+        resolve(undefined);
+      }
+    });
+  });
 }

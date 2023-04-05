@@ -10,8 +10,13 @@
     <form id="settingsForm">
       <label for="spaceDomain">スペースドメイン:</label>
       <input type="text" id="spaceDomain" name="spaceDomain" required placeholder="https://○○.ovice.in の○○がスペースドメインです">
+      <div class="form-row">
+        <input type="checkbox" id="systemLock" name="systemLock">
+        <label for="systemLock">システムがロックされたら離席する</label>
+        <span class="experimental-tag">試験的</span>
+      </div>
       <button type="submit">保存</button>
-    </form>
+    </form>    
     <script src="../js/options.js"></script>
   </body>
 </html>
