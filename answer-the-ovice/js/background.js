@@ -59,6 +59,7 @@ let isCurrentStateLocked = false;
 
 function checkIdleState() {
   chrome.idle.queryState(idleInterval, (state) => {
+    sendChangeLeavingMessage();
     isStateLocked = state === "locked";
     if (isCurrentStateLocked !== isStateLocked) {
       // 状態が変化した場合のみログを出力
@@ -79,8 +80,6 @@ function checkIdleState() {
 }
 
 isSystemLock().then((isSystemLock) => {
-
-  console.log(`systemLock: ` + isSystemLock);
   if (isSystemLock) {
     // 最初の状態確認を開始
     checkIdleState();
@@ -200,12 +199,13 @@ async function getOveceUrl() {
 
 async function isSystemLock() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get("systemLock", (data) => {
-      if (data.systemLock) {
-        resolve(data.systemLock);
-      } else {
-        resolve(undefined);
-      }
-    });
+    return undefined;
+    // chrome.storage.sync.get("systemLock", (data) => {
+    //   if (data.systemLock) {
+    //     resolve(data.systemLock);
+    //   } else {
+    //     resolve(undefined);
+    //   }
+    // });
   });
 }

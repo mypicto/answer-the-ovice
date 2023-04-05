@@ -51,6 +51,7 @@ function clickMicrophoneButton() {
 
 function clickLeavingButton() {
   const button = getLeavingButton();
+  console.log("button: " + button());
   if (button) {
     button.click();
   }
@@ -75,6 +76,8 @@ function getMicrophoneButtonStatus() {
 }
 
 function changeLeaving() {
+  console.log("changeLeaving");
+  console.log("getLeavingButtonStatus: " + getLeavingButtonStatus());
   if (getLeavingButtonStatus() === false) {
     clickLeavingButton();
   }
@@ -84,7 +87,6 @@ function getLeavingButtonStatus() {
   const button = getLeavingButton();
   if (button) {
     if (button.classList.contains('MuiIconButton-colorInfo')) {
-      console.log(true);
       return true;
     } else if (button.classList.contains('MuiIconButton-colorSecondary')) {
       return false;
@@ -94,12 +96,12 @@ function getLeavingButtonStatus() {
 }
 
 function getMicrophoneButton() {
-  const xpath = '//*[@id="MenuBar"]/div[2]/button[1]';
+  const xpath = '//*[@id="MenuBar"]/div[3]/button[2]';
   return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
 function getLeavingButton() {
-  const xpath = '//*[@id="root"]/div[1]/header/div/div[2]/button[4]';
+  const xpath = '//*[@id="status-menu"]/li[2]';
   return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
