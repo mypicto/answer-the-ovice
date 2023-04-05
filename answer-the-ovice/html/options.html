@@ -10,11 +10,9 @@
     <form id="settingsForm">
       <label for="spaceDomain">スペースドメイン:</label>
       <input type="text" id="spaceDomain" name="spaceDomain" required placeholder="https://○○.ovice.in の○○がスペースドメインです">
-      <!-- <div class="form-row">
-        <input type="checkbox" id="systemLock" name="systemLock">
-        <label for="systemLock">システムがロックされたら離席する</label>
-        <span class="experimental-tag">試験的</span>
-      </div> -->
+      <label for="spaceDomain">ミュートボタンの xPath:</label>
+      <input type="text" id="microphoneXPath" name="microphoneXPath" required>
+      <div class="description">※ 通常は変更しないでください。</div>
       <button type="submit">保存</button>
     </form>    
     <script src="../js/options.js"></script>

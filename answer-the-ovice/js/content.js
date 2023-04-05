@@ -2,9 +2,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'click_microphone_button') {
     clickMicrophoneButton();
     sendResponse({});
-  } else if (request.message === 'change_leaving') {
-    changeLeaving();
-    sendResponse({});
   } else if (request.message === 'check_button') {
     checkMicrophoneButtonStatus();
     sendResponse({});
@@ -13,8 +10,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 let observeButtonRetryCount = 0;
 
-function observeButton() {
-  const button = getMicrophoneButton();
+async function observeButton() {
+  const button = await getMicrophoneButton();
 
   if (button) {
     checkMicrophoneButtonStatus();
@@ -43,66 +40,52 @@ function observeButton() {
 }
 
 function clickMicrophoneButton() {
-  const button = getMicrophoneButton();
-  if (button) {
-    button.click();
-  }
-}
-
-function clickLeavingButton() {
-  const button = getLeavingButton();
-  console.log("button: " + button());
-  if (button) {
-    button.click();
-  }
+  getMicrophoneButton().then((button) => {
+    if (button) {
+      button.click();
+    }
+  });
 }
 
 function checkMicrophoneButtonStatus() {
-  const isOn = getMicrophoneButtonStatus();
-  if (isOn === undefined) {
-    sendMessageToBackground({ message: 'update_icon', isOn: false, disabled: true });
-  } else {
-    sendMessageToBackground({ message: 'update_icon', isOn: isOn, disabled: false });
-  }
-}
-
-function getMicrophoneButtonStatus() {
-  const button = getMicrophoneButton();
-  if (button) {
-    return button.getAttribute('data-status') === 'true';
-  } else {
-    return undefined;
-  }
-}
-
-function changeLeaving() {
-  console.log("changeLeaving");
-  console.log("getLeavingButtonStatus: " + getLeavingButtonStatus());
-  if (getLeavingButtonStatus() === false) {
-    clickLeavingButton();
-  }
-}
-
-function getLeavingButtonStatus() {
-  const button = getLeavingButton();
-  if (button) {
-    if (button.classList.contains('MuiIconButton-colorInfo')) {
-      return true;
-    } else if (button.classList.contains('MuiIconButton-colorSecondary')) {
-      return false;
+  getMicrophoneButtonStatus().then((isOn) => {
+    if (isOn === undefined) {
+      sendMessageToBackground({ message: 'update_icon', isOn: false, disabled: true });
+    } else {
+      sendMessageToBackground({ message: 'update_icon', isOn: isOn, disabled: false });
     }
-  }
-  return undefined;
+  });
 }
 
-function getMicrophoneButton() {
-  const xpath = '//*[@id="MenuBar"]/div[3]/button[2]';
-  return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+async function getMicrophoneButtonStatus() {
+
+  const button = await getMicrophoneButton();
+
+  return new Promise((resolve) => {
+    if (button) {
+      const isOn = button.getAttribute('data-status') === 'true';
+      resolve(isOn);
+    } else {
+      resolve(undefined);
+    }
+  });
 }
 
-function getLeavingButton() {
-  const xpath = '//*[@id="status-menu"]/li[2]';
-  return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+async function getMicrophoneButton() {
+  return new Promise((resolve) => {
+    if (chrome.runtime.lastError) {
+      resolve(undefined);
+    }
+    chrome.storage.sync.get("microphoneXPath", (data) => {
+      const xpath = data.microphoneXPath;
+      if (xpath) {
+        const button = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        resolve(button);
+      } else {
+        resolve(undefined);
+      }
+    });
+  });
 }
 
 function sendMessageToBackground(message) {

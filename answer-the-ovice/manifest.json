@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Answer the ovice",
+    "name": "Answer the Ovice",
     "version": "1.0",
     "description": "Operates microphone mute in ovice.",
     "icons": {
