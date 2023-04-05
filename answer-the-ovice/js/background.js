@@ -1,4 +1,3 @@
-let contentScriptReady = false;
 let globalIconState = {
   isOn: false,
   isDisabled: false,
@@ -44,6 +43,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+//
+// PCがロックされたら離席
+//
+const idleInterval = 20;
+let isCurrentStateLocked = false;
+
+function checkIdleState() {
+  chrome.idle.queryState(idleInterval, (state) => {
+    isStateLocked = state === "locked";
+    if (isCurrentStateLocked !== isStateLocked) {
+      // 状態が変化した場合のみログを出力
+      isCurrentStateLocked = isStateLocked;
+      const currentDateTime = new Date().toLocaleString();
+      
+      if (isStateLocked) {
+        console.log(`[${currentDateTime}] User is locked from the computer`);
+        sendChangeLeavingMessage();
+      } else {
+        console.log(`[${currentDateTime}] User is active at the computer`);
+      }
+    }
+  });
+
+  // 次の状態確認をスケジュール
+  setTimeout(checkIdleState, idleInterval * 1000);
+}
+
+// 最初の状態確認を開始
+checkIdleState();
+
 function isOviceTab(tab, oviceUrl) {
   let discarded = tab.discarded;
   let isOvice = tab.url.startsWith(oviceUrl);
@@ -55,7 +84,11 @@ function sendCheckButtonMessage() {
 }
 
 function sendClickButtonMessage() {
-  sendMessageToOviceTab({ message: "click_button" });
+  sendMessageToOviceTab({ message: "click_microphone_button" });
+}
+
+function sendChangeLeavingMessage() {
+  sendMessageToOviceTab({ message: "change_leaving" });
 }
 
 function sendMessageToOviceTab(message) {

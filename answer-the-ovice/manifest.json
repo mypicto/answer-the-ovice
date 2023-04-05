@@ -12,7 +12,7 @@
     "background": {
       "service_worker": "js/background.js"
     },
-    "permissions": ["activeTab", "scripting", "tabs", "storage"],
+    "permissions": ["activeTab", "scripting", "tabs", "storage", "idle"],
     "content_scripts": [
       {
         "matches": ["https://*.ovice.in/*"],
