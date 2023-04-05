@@ -3,7 +3,6 @@ let globalIconState = {
   isOn: false,
   isDisabled: false,
 };
-reloadOviceTabs();
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
@@ -32,6 +31,8 @@ chrome.action.onClicked.addListener(async () => {
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: '../html/options.html' });
+  } else if (details.reason === 'update') {
+    reloadOviceTabs();
   }
 });
 
