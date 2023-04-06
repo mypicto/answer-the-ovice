@@ -13,7 +13,7 @@ oviceのタブに切り替えなくても、呼びかけに応じることがで
 
 ## インストール方法
 
-1. [Releases](https://github.com/mypicto/answer-the-ovice/releases) から最新版のZIPファイルをダウンロードし、ローカルに保存します。  
+1. [Releases](https://github.com/mypicto/answer-the-ovice/releases/latest) から最新版のZIPファイルをダウンロードし、ローカルに保存します。  
   ZIPをダウンロードした場合は、解凍して任意のフォルダに配置してください。  
   このフォルダは拡張機能を使用しなくなるかアンインストールするまで移動や削除をしないでください。  
   （移動した場合は拡張機能の再インストールが必要です）
