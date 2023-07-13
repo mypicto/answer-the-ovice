@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.microphoneXPath !== undefined) {
       microphoneXPathInput.value = data.microphoneXPath;
     } else {
-      microphoneXPathInput.value = '//*[@id="MenuBar"]/div[3]/button[2]';
+      microphoneXPathInput.value = '//*[@id="MenuBar"]/div[2]/button[2]';
     }
   });
 
