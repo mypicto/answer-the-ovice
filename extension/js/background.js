@@ -152,6 +152,12 @@ class EventListenerManager {
     chrome.action.onClicked.addListener(async () => {
       this.messageManager.sendClickButtonMessage();
     });
+
+    chrome.commands.onCommand.addListener((command) => {
+      if (command === "toggle-microphone") {
+        this.messageManager.sendClickButtonMessage();
+      }
+    });
     
     chrome.runtime.onInstalled.addListener((details) => {
       if (details.reason === 'install') {
