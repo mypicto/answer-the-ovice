@@ -46,6 +46,19 @@ input {
   box-sizing: border-box;
 }
 
+a {
+  color: #777;
+}
+a:visited {
+  color: #777;
+}
+a:hover {
+  color: #777;
+}
+a:active {
+  color: #777;
+}
+
 button {
   padding: 10px 20px;
   background-color: #3366ff;
@@ -57,7 +70,6 @@ button {
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 button:hover {
   background-color: #1a45ff;
 }
@@ -65,22 +77,14 @@ button:hover {
 .description {
   align-self: flex-start;
   margin-left: 20px;
+  margin-bottom: 20px;
   font-size: 14px;
   color: #777;
-  margin-bottom: 20px;
 }
 
-.description a {
-  color: #777;
-}
-.description a:visited {
-  color: #777;
-}
-.description a:hover {
-  color: #777;
-}
-.description a:active {
-  color: #777;
+.body-text {
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 footer {
