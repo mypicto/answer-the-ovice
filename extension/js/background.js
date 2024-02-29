@@ -18,28 +18,33 @@ class OviceTabManager {
   }
 
   async reloadOviceTabs() {
-    this.getOveceUrl().then((oviceUrl) => {
-      chrome.tabs.query({}, (tabs) => {
-        for (const tab of tabs) {
-          if (this.isOviceTab(tab, oviceUrl)) {
-            chrome.tabs.reload(tab.id);
-          }
-        }
-      });
-    });
+    let tabId = await this.getOviceTabId();
+    chrome.tabs.reload(tabId);
+  }
+
+  async activeOviceTab() {
+    let tabId = await this.getOviceTabId();
+    if (tabId !== undefined) {
+      chrome.tabs.update(tabId, { active: true });
+    }
   }
 
   async hasOviceTab() {
+    let tabId = await this.getOviceTabId();
+    return tabId !== undefined;
+  }
+
+  async getOviceTabId() {
     return new Promise((resolve) => {
       this.getOveceUrl().then((oviceUrl) => {
         chrome.tabs.query({}, (tabs) => {
           for (const tab of tabs) {
             if (this.isOviceTab(tab, oviceUrl)) {
-              resolve(true);
+              resolve(tab.id);
               return;
             }
           }
-          resolve(false);
+          resolve(undefined);
         });
       });
     });
@@ -117,6 +122,10 @@ class IconManager {
     chrome.action.setIcon({ tabId: tabId, path: iconPath });
   }
 
+  isStateOff() {
+    return !this.iconState.isOn && !this.iconState.isDisabled;
+  }
+
 }
 
 class EventListenerManager {
@@ -153,9 +162,12 @@ class EventListenerManager {
       this.messageManager.sendClickButtonMessage();
     });
 
-    chrome.commands.onCommand.addListener((command) => {
+    chrome.commands.onCommand.addListener(async (command) => {
       if (command === "toggle-microphone") {
         this.messageManager.sendClickButtonMessage();
+        if (this.iconManager.isStateOff()) {
+          this.oviceTabManager.activeOviceTab();
+        }
       }
     });
     
