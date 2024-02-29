@@ -64,10 +64,23 @@ button:hover {
 
 .description {
   align-self: flex-start;
-  margin-left: 20px; /* インデント */
+  margin-left: 20px;
   font-size: 14px;
-  color: #777; /* 主張しない色 */
+  color: #777;
   margin-bottom: 20px;
+}
+
+.description a {
+  color: #777;
+}
+.description a:visited {
+  color: #777;
+}
+.description a:hover {
+  color: #777;
+}
+.description a:active {
+  color: #777;
 }
 
 footer {

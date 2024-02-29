@@ -1,14 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('settingsForm');
-  const spaceDomainInput = document.getElementById('spaceDomain');
+  const spaceUrlInput = document.getElementById('spaceUrl');
   const microphoneXPathInput = document.getElementById('microphoneXPath');
-  const validInput = /^[a-zA-Z0-9-]{3,}$/;
   const xpathAllowedPattern = /^[a-zA-Z0-9\s\-_/.*@[\]():,'"=|]+$/;
 
   // Load the current values from storage
-  chrome.storage.sync.get(['spaceDomain', 'microphoneXPath'], (data) => {
-    if (data.spaceDomain !== undefined) {
-      spaceDomainInput.value = data.spaceDomain;
+  chrome.storage.sync.get(['spaceUrl', 'microphoneXPath'], (data) => {
+    if (data.spaceUrl !== undefined) {
+      spaceUrlInput.value = data.spaceUrl;
     }
     if (data.microphoneXPath !== undefined) {
       microphoneXPathInput.value = data.microphoneXPath;
@@ -20,10 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Save the values to storage when the form is submitted
   form.addEventListener('submit', (event) => {
 
-    spaceDomain = extractSpaceDomain(spaceDomainInput.value);
+    spaceUrl = extractSpaceUrl(spaceUrlInput.value);
 
-    if (!validInput.test(spaceDomain)) {
-      alert('無効なスペースドメインです。英数字3文字以上で、記号はハイフンのみ利用可能です。');
+    if (spaceUrl === undefined) {
+      alert('無効なスペースURLです。');
       return;
     }
     if (!xpathAllowedPattern.test(microphoneXPathInput.value)) {
@@ -33,28 +32,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     event.preventDefault();
     chrome.storage.sync.set({
-      spaceDomain: spaceDomain,
+      spaceUrl: spaceUrl,
       microphoneXPath: microphoneXPathInput.value
     }, () => {
-      console.log('Space domain saved:', spaceDomain);
+      console.log('Space url saved:', spaceUrl);
       console.log('Microphone xPath saved:', microphoneXPathInput.value);
       chrome.runtime.sendMessage({ message: "reload_ovice_tabs" });
       alert('保存されました。');
-      spaceDomainInput.value = spaceDomain;
+      spaceUrlInput.value = spaceUrl;
     });
   });
 });
 
-function extractSpaceDomain(url) {
+function extractSpaceUrl(url) {
   // https://<スペースドメイン>.ovice.in
-  let regex = /([^\/]+)\.ovice\.in/;
+  let regex = /^(https:\/\/[a-zA-Z0-9-]{3,}\.ovice\.in)/;
   let match = url.match(regex);
 
   // https://app.rc.ovice.com/ws/<スペースドメイン>
   if (!match) {
-    regex = /app\.rc\.ovice\.com\/ws\/([^\/]+)/;
+    regex = /^(https:\/\/app\.rc\.ovice\.com\/ws\/[a-zA-Z0-9-]{3,})$/;
     match = url.match(regex);
   }
 
-  return match ? match[1] : url;
+  if (match) {
+    return `${match[0]}/`
+  }
+  return undefined
 }

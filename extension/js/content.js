@@ -100,11 +100,11 @@ function sendMessageToBackground(message) {
   }
 }
 
-async function getSpaceDomain() {
+async function getSpaceUrl() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get("spaceDomain", (data) => {
-      if (data.spaceDomain) {
-        resolve(data.spaceDomain);
+    chrome.storage.sync.get("spaceUrl", (data) => {
+      if (data.spaceUrl) {
+        resolve(data.spaceUrl);
       } else {
         resolve(undefined);
       }
@@ -112,12 +112,7 @@ async function getSpaceDomain() {
   });
 }
 
-async function getOveceUrl() {
-  const spaceDomain = await getSpaceDomain();
-  return `https://${spaceDomain}.ovice.in/`;
-}
-
-getOveceUrl().then((oviceUrl) => {
+getSpaceUrl().then((oviceUrl) => {
   if (window.location.href.startsWith(oviceUrl)) {
     observeButton();
     checkMicrophoneButtonStatus();

@@ -15,7 +15,7 @@
     "permissions": ["activeTab", "scripting", "tabs", "storage", "idle"],
     "content_scripts": [
       {
-        "matches": ["https://*.ovice.in/*"],
+        "matches": ["https://*.ovice.in/*", "https://app.rc.ovice.com/ws/*"],
         "js": ["js/content.js"],
         "run_at": "document_idle"
       }

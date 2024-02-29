@@ -1,20 +1,51 @@
-class OviceTabManager {
+class StorageManager {
 
-  async getOveceUrl() {
-    const spaceDomain = await this.getSpaceDomain();
-    return `https://${spaceDomain}.ovice.in/`;
+  async migration() {
+    const data = await this.getStorageData(['spaceDomain', 'spaceUrl']);
+    if (data.spaceDomain && (!data.spaceUrl || data.spaceUrl === '')) {
+      const newSpaceUrl = `https://${data.spaceDomain}.ovice.in/`;
+      await this.setStorageData({ 'spaceUrl': newSpaceUrl });
+    }
   }
 
-  async getSpaceDomain() {
-    return new Promise((resolve) => {
-      chrome.storage.sync.get("spaceDomain", (data) => {
-        if (data.spaceDomain) {
-          resolve(data.spaceDomain);
+  async getStorageData(keys) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get(keys, (result) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
         } else {
-          resolve(undefined);
+          resolve(result);
         }
       });
     });
+  }
+  
+  async setStorageData(items) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.set(items, () => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+}
+
+class OviceTabManager {
+
+  constructor(storageManager) {
+    this.storageManager = storageManager;
+  }
+
+  async getSpaceUrl() {
+    let data = await this.storageManager.getStorageData(['spaceUrl']);
+    if (data.spaceUrl) {
+      return data.spaceUrl;
+    } else {
+      return undefined;
+    }
   }
 
   async reloadOviceTabs() {
@@ -36,7 +67,7 @@ class OviceTabManager {
 
   async getOviceTabId() {
     return new Promise((resolve) => {
-      this.getOveceUrl().then((oviceUrl) => {
+      this.getSpaceUrl().then((oviceUrl) => {
         chrome.tabs.query({}, (tabs) => {
           for (const tab of tabs) {
             if (this.isOviceTab(tab, oviceUrl)) {
@@ -73,7 +104,7 @@ class MessageManager {
   }
 
   sendMessageToOviceTab(message) {
-    this.oviceTabManager.getOveceUrl().then((oviceUrl) => {
+    this.oviceTabManager.getSpaceUrl().then((oviceUrl) => {
       chrome.tabs.query({}, (tabs) => {
         for (const tab of tabs) {
           if (this.oviceTabManager.isOviceTab(tab, oviceUrl)) {
@@ -130,7 +161,8 @@ class IconManager {
 
 class EventListenerManager {
 
-  constructor(oviceTabManager, messageManager, iconManager) {
+  constructor(storageManager, oviceTabManager, messageManager, iconManager) {
+    this.storageManager = storageManager;
     this.oviceTabManager = oviceTabManager;
     this.messageManager = messageManager;
     this.iconManager = iconManager;
@@ -145,7 +177,7 @@ class EventListenerManager {
     });
     
     chrome.tabs.onActivated.addListener((activeInfo) => {
-      this.oviceTabManager.getOveceUrl().then((oviceUrl) => {
+      this.oviceTabManager.getSpaceUrl().then((oviceUrl) => {
         chrome.tabs.get(activeInfo.tabId, (tab) => {
           if (!this.oviceTabManager.isOviceTab(tab, oviceUrl)) {
             this.iconManager.refresh(activeInfo.tabId);
@@ -175,6 +207,7 @@ class EventListenerManager {
       if (details.reason === 'install') {
         chrome.tabs.create({ url: '../html/options.html' });
       } else if (details.reason === 'update') {
+        this.storageManager.migration();
         this.oviceTabManager.reloadOviceTabs();
       }
     });
@@ -199,9 +232,10 @@ class EventListenerManager {
   }
 }
 
-let oviceTabManager = new OviceTabManager();
+let storageManager = new StorageManager()
+let oviceTabManager = new OviceTabManager(storageManager);
 let messageManager = new MessageManager(oviceTabManager);
 let iconManager = new IconManager();
-let eventListenerManager = new EventListenerManager(oviceTabManager, messageManager, iconManager);
+let eventListenerManager = new EventListenerManager(storageManager, oviceTabManager, messageManager, iconManager);
 
 eventListenerManager.addEventListener();
