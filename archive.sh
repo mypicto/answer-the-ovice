@@ -1,9 +1,10 @@
 #!/bin/bash
 
-current_dir="$(pwd)"
-parent_dir="$(dirname "$current_dir")"
-dir_name="$(basename "$current_dir")"
-zip_name="${dir_name}.zip"
+extension_dir="extension"
+tmp_dir="tmp"
+current_dir_name="$(basename "$(pwd)")"
+archive_dir="${tmp_dir}/${current_dir_name}"
+zip_name="${current_dir_name}.zip"
 
 # 除外するファイルやディレクトリのパターンを定義
 exclude_patterns=(
@@ -19,5 +20,12 @@ for pattern in "${exclude_patterns[@]}"; do
   exclude_args+=" -x $pattern"
 done
 
-cd "$parent_dir" || exit
-zip -r -X "$zip_name" "$dir_name" $exclude_args
+mkdir -p "${archive_dir}"
+cp -r "$extension_dir"/* "${archive_dir}/"
+cp -r "LICENSE" "${archive_dir}/"
+
+cd "tmp" || exit
+zip -r -X "../$zip_name" . $exclude_args
+cd ..
+
+rm -rf "tmp"
