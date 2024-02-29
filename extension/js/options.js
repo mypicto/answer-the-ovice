@@ -20,7 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Save the values to storage when the form is submitted
   form.addEventListener('submit', (event) => {
 
-    if (!validInput.test(spaceDomainInput.value)) {
+    spaceDomain = extractSpaceDomain(spaceDomainInput.value);
+
+    if (!validInput.test(spaceDomain)) {
       alert('無効なスペースドメインです。英数字3文字以上で、記号はハイフンのみ利用可能です。');
       return;
     }
@@ -31,13 +33,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     event.preventDefault();
     chrome.storage.sync.set({
-      spaceDomain: spaceDomainInput.value,
+      spaceDomain: spaceDomain,
       microphoneXPath: microphoneXPathInput.value
     }, () => {
-      console.log('Space domain saved:', spaceDomainInput.value);
+      console.log('Space domain saved:', spaceDomain);
       console.log('Microphone xPath saved:', microphoneXPathInput.value);
       chrome.runtime.sendMessage({ message: "reload_ovice_tabs" });
       alert('保存されました。');
+      spaceDomainInput.value = spaceDomain;
     });
   });
 });
+
+function extractSpaceDomain(url) {
+  // https://<スペースドメイン>.ovice.in
+  let regex = /([^\/]+)\.ovice\.in/;
+  let match = url.match(regex);
+
+  // https://app.rc.ovice.com/ws/<スペースドメイン>
+  if (!match) {
+    regex = /app\.rc\.ovice\.com\/ws\/([^\/]+)/;
+    match = url.match(regex);
+  }
+
+  return match ? match[1] : url;
+}
