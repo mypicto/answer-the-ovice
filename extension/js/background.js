@@ -147,7 +147,7 @@ class IconManager {
     const iconPath =  this.iconState.isDisabled
       ? "../image/icon_disable.png"
       :  this.iconState.isOn
-      ? "../image/icon_on_green.png"
+      ? "../image/icon_on.png"
       : "../image/icon_off.png";
   
     chrome.action.setIcon({ tabId: tabId, path: iconPath });
