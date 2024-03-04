@@ -23,7 +23,11 @@
     "options_page": "html/options.html",
     "commands": {
       "toggle-microphone": {
-        "description": "Toggle microphone",
+        "description": "Toggle Microphone",
+        "global": true
+      },
+      "toggle-microphone-and-active-tab": {
+        "description": "Toggle Microphone and Activate Tab",
         "global": true
       }
     }

@@ -197,9 +197,9 @@ class EventListenerManager {
     chrome.commands.onCommand.addListener(async (command) => {
       if (command === "toggle-microphone") {
         this.messageManager.sendClickButtonMessage();
-        if (this.iconManager.isStateOff()) {
-          this.oviceTabManager.activeOviceTab();
-        }
+      } else if (command === "toggle-microphone-and-active-tab") {
+        this.messageManager.sendClickButtonMessage();
+        this.oviceTabManager.activeOviceTab();
       }
     });
     
