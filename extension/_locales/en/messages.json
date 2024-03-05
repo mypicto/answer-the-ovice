@@ -1,0 +1,11 @@
+{
+    "extensionDescription": {
+        "message": "An extension that allows easy toggling between muting and unmuting the microphone in ovice. You can respond to calls without having to switch to the ovice tab."
+    },
+    "commandToggleMicrophone": {
+        "message": "Toggle Microphone"
+    },
+    "commandToggleMicrophoneAndActiveTab": {
+        "message": "Toggle Microphone and Activate Tab"
+    }
+}
