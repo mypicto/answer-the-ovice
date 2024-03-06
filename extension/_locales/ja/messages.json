@@ -2,10 +2,10 @@
     "extensionDescription": {
         "message": "oviceのマイクのミュート・ミュート解除を簡単に切り替えることができる拡張機能。oviceのタブに切り替えなくても、呼びかけに応じることができます。"
     },
-    "toggleMicrophone": {
+    "commandToggleMicrophone": {
         "message": "マイク オン/オフ"
     },
-    "toggleMicrophoneAndActiveTab": {
+    "commandToggleMicrophoneAndActiveTab": {
         "message": "マイク オン/オフ して、タブをアクティブにする"
     }
 }
