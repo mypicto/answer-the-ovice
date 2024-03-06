@@ -9,6 +9,7 @@ oviceのタブに切り替えなくても、呼びかけに応じることがで
 * Microsoft Edge
 * Opera
 * Brave
+* Arc
 * 他、Chromium 派生のブラウザ
 
 ## インストール方法
@@ -37,9 +38,9 @@ oviceのタブに切り替えなくても、呼びかけに応じることがで
 
 | 色 | 説明 |
 | ---- | ------ |
-| 赤色 | ミュート状態です。 |
-| 緑色 | マイク有効状態です。 |
-| 灰色 | oviceのタブが開かれていない。<br>またはスペースドメインが適切に設定されておらず、oviceのタブが見つからない。 |
+| ![赤色](https://github.com/mypicto/answer-the-ovice/blob/main/extension/image/icon_off.png) | ミュート状態です。 |
+| ![緑色](https://github.com/mypicto/answer-the-ovice/blob/main/extension/image/icon_on.png) | マイク有効状態です。 |
+| ![灰色](https://github.com/mypicto/answer-the-ovice/blob/main/extension/image/icon_disable.png) | oviceのタブが開かれていない。<br>またはスペースドメインが適切に設定されておらず、oviceのタブが見つからない。 |
 
 ### ショートカットキー
 
