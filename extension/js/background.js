@@ -192,6 +192,7 @@ class EventListenerManager {
     
     chrome.action.onClicked.addListener(async () => {
       this.messageManager.sendClickButtonMessage();
+      this.oviceTabManager.activeOviceTab();
     });
 
     chrome.commands.onCommand.addListener(async (command) => {
