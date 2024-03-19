@@ -179,7 +179,7 @@ class EventListenerManager {
     chrome.tabs.onActivated.addListener((activeInfo) => {
       this.oviceTabManager.getSpaceUrl().then((oviceUrl) => {
         chrome.tabs.get(activeInfo.tabId, (tab) => {
-          if (!this.oviceTabManager.isOviceTab(tab, oviceUrl)) {
+          if (tab && !this.oviceTabManager.isOviceTab(tab, oviceUrl)) {
             this.iconManager.refresh(activeInfo.tabId);
           }
         });
