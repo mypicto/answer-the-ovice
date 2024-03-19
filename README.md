@@ -1,6 +1,6 @@
 # Answer the ovice
 
-![スクリーンショット](https://github.com/mypicto/answer-the-ovice/blob/main/store/image/store_screenshot.png.png)
+![スクリーンショット](https://github.com/mypicto/answer-the-ovice/blob/main/store/image/store_screenshot.png)
 
 Answer the oviceは、oviceのマイクのミュート・ミュート解除を簡単に切り替えることができるChrome拡張機能です。
 oviceのタブに切り替えなくても、呼びかけに応じることができます。
