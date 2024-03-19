@@ -2,8 +2,8 @@
 
 ![スクリーンショット](https://github.com/mypicto/answer-the-ovice/blob/main/store/image/store_screenshot.png)
 
-Answer the oviceは、oviceのマイクのミュート・ミュート解除を簡単に切り替えることができるChrome拡張機能です。
-oviceのタブに切り替えなくても、呼びかけに応じることができます。
+oviceのタブを開くことなくマイクボタンのOn/Offを簡単に切り替え、呼びかけに応じることができます。  
+また、キーボードショートカットを割り当てれば、他アプリでの作業中にもマイクボタンの操作が可能です。
 
 ## 動作環境
 
