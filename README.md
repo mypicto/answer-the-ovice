@@ -1,6 +1,6 @@
-# Answer the Ovice
+# Answer the ovice
 
-Answer the Oviceは、oviceのマイクのミュート・ミュート解除を簡単に切り替えることができるChrome拡張機能です。
+Answer the oviceは、oviceのマイクのミュート・ミュート解除を簡単に切り替えることができるChrome拡張機能です。
 oviceのタブに切り替えなくても、呼びかけに応じることができます。
 
 ## 動作環境
@@ -67,4 +67,4 @@ Chromeの 拡張機能を管理 > キーボードショートカット からシ
 5. 右側のビューでマイクボタンのHTMLタグが選択状態になる
 6. そのタグが `<button>` タグである事を確認したらタグを右クリック
 7. コンテキストメニューから "Copy > Copy XPath" を選択
-8. Answer the Ovice のオプション画面から "マイクボタンの xPath" に貼り付けて保存
+8. Answer the ovice のオプション画面から "マイクボタンの xPath" に貼り付けて保存
