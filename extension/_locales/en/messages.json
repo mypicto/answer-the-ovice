@@ -1,6 +1,6 @@
 {
     "extensionDescription": {
-        "message": "An extension to easily mute or unmute your ovice mic, allowing you to respond without switching to the ovice tab."
+        "message": "Switch your mic on/off and respond to calls without opening the ovice tab."
     },
     "commandToggleMicrophone": {
         "message": "Toggle Microphone"
