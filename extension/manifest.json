@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Answer the ovice",
-    "version": "1.8",
+    "version": "2.0",
     "default_locale": "en",
     "description": "__MSG_extensionDescription__",
     "icons": {
