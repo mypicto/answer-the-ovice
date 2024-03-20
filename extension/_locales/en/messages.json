@@ -7,5 +7,47 @@
     },
     "commandToggleMicrophoneAndActiveTab": {
         "message": "Toggle Microphone and Activate Tab"
+    },
+    "optionsTitle": {
+        "message": "Answer the ovice Options"
+    },
+    "optionsSpaceUrlLabel": {
+        "message": "Space URL:"
+    },
+    "optionsSpaceUrlPlaceholder": {
+        "message": "https://*****.ovice.in/"
+    },
+    "optionsSpaceUrlDescription": {
+        "message": "※ How to get your space URL"
+    },
+    "optionsSpaceUrlHelpUrl": {
+        "message": "https://help.ovice.com/hc/ja/articles/28187339106585-%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9URL%E3%81%AE%E5%8F%96%E5%BE%97"
+    },
+    "optionsMicrophoneXPathLabel": {
+        "message": "Microphone Button's XPath:"
+    },
+    "optionsMicrophoneXPathDescription": {
+        "message": "※ Please review only if Answer the ovice can no longer track the state of the ovice microphone button."
+    },
+    "optionsNoticeLabel": {
+        "message": "Note:"
+    },
+    "optionsNoticeDescription1": {
+        "message": "Depending on the version of ovice, you may need to turn on \""
+    },
+    "optionsNoticeDescription2": {
+        "message": "Always show menubar in workspace"
+    },
+    "optionsNoticeDescription3": {
+        "message": "\" from Personal Settings > Space Settings to recognize the microphone button."
+    },
+    "optionsNoticeOviceSettingsUrl": {
+        "message": "https://help.ovice.com/hc/en-us/articles/21784098268825-Space-Settings#h_01HQMD7GVCFD3Z6S063N50MCNA"
+    },
+    "optionsSaveButton": {
+        "message": "Save"
+    },
+    "optionsDevelopersGithub": {
+        "message": "Developer's GitHub"
     }
 }

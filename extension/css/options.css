@@ -13,6 +13,14 @@ h1 {
   padding: 20px 0;
 }
 
+h3 {
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 5px 0;
+}
+
 form {
   display: flex;
   flex-direction: column;

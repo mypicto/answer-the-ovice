@@ -1,3 +1,55 @@
+class LocalizeManager {
+  
+    constructor() {
+      this.localizeElements = document.querySelectorAll('[localize]');
+      this.localizePlaceholderElements = document.querySelectorAll('[localize_placeholder]');
+      this.localizeHrefElements = document.querySelectorAll('[localize_href]');
+    }
+  
+    init() {
+      this.localizeContent();
+      this.localizePlaceholder();
+      this.localizeHref();
+    }
+
+    localizeContent() {
+      this.localizeElements.forEach((element) => {
+        let regex = /__MSG_(\w+)__/;
+        let match;
+        let localizedText = element.textContent;
+    
+        while ((match = regex.exec(localizedText)) !== null) {
+          let msgKey = match[1];
+          let localizedString = chrome.i18n.getMessage(msgKey);
+    
+          localizedText = localizedText.replace(match[0], localizedString);
+        }
+
+        element.textContent = localizedText;
+      });
+    }
+
+    localizePlaceholder() {
+      this.localizePlaceholderElements.forEach((element) => {
+        let matches = element.getAttribute('localize_placeholder').match(/^__MSG_(\w+)__$/);
+        if (matches) {
+          let key = matches[1];
+          element.setAttribute('placeholder', chrome.i18n.getMessage(key));
+        }
+      });
+    }
+
+    localizeHref() {
+      this.localizeHrefElements.forEach((element) => {
+        let matches = element.getAttribute('localize_href').match(/^__MSG_(\w+)__$/);
+        if (matches) {
+          let key = matches[1];
+          element.setAttribute('href', chrome.i18n.getMessage(key));
+        }
+      });
+    }
+}
+
 class StorageManager {
 
   async getStorageData(keys) {
@@ -121,8 +173,10 @@ function validateMicrophoneXPath(xpath) {
   return true;
 }
 
+let localizeManager = new LocalizeManager()
 let storageManager = new StorageManager()
 let inputManager = new InputManager(storageManager)
 document.addEventListener('DOMContentLoaded', () => {
   inputManager.init();
+  localizeManager.init();
 });
