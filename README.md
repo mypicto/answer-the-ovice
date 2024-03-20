@@ -2,9 +2,14 @@
 
 ## はじめに
 
-この拡張機能は、非公式のoviceのサポートツールです。  
-類似した機能を持つ公式の拡張機能 "oVice Supporter Tools Extension" が存在しますので、まずはそちらをご利用いただくことを推奨します。  
-https://chromewebstore.google.com/detail/ovice-supporter-tools-ext/kecpfjcmglfdlejmkbdimjckgfgliokh
+この拡張機能は、非公式のoviceのツールです。
+
+類似した機能を持つ公式の拡張機能 [oVice Supporter Tools Extension](https://chromewebstore.google.com/detail/ovice-supporter-tools-ext/kecpfjcmglfdlejmkbdimjckgfgliokh) が存在します。
+
+また、この拡張機能により近い方向性、かつ上位互換のものとして、punkshiraishi さま作成の [oVSwitch](https://chromewebstore.google.com/detail/ldohahnbhclmpimkninjoellgemepljl?hl=ja) が公開されています。
+
+まずはこれらをご利用いただくことを推奨します。  
+
 
 ## この拡張機能について
 
