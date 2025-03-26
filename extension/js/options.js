@@ -150,6 +150,12 @@ function extractSpaceUrl(url) {
     match = url.match(regex);
   }
 
+  // https://app.ovice.com/ws/*/<スペースドメイン>
+  if (!match) {
+    regex = /^(https:\/\/app\.ovice\.com\/ws\/[a-zA-Z0-9-]{3,})$/;
+    match = url.match(regex);
+  }
+
   if (match) {
     return `${match[0]}/`
   }
