@@ -1,5 +1,4 @@
-class StorageManager {
-
+class ConfigStorage {
   async migration() {
     const data = await this.getStorageData(['spaceDomain', 'spaceUrl']);
     if (data.spaceDomain && (!data.spaceUrl || data.spaceUrl === '')) {
@@ -33,14 +32,13 @@ class StorageManager {
   }
 }
 
-class OviceTabManager {
-
-  constructor(storageManager) {
-    this.storageManager = storageManager;
+class TabService {
+  constructor(configStorage) {
+    this.configStorage = configStorage;
   }
 
   async getSpaceUrl() {
-    let data = await this.storageManager.getStorageData(['spaceUrl']);
+    let data = await this.configStorage.getStorageData(['spaceUrl']);
     if (data.spaceUrl) {
       return data.spaceUrl;
     } else {
@@ -50,7 +48,9 @@ class OviceTabManager {
 
   async reloadOviceTabs() {
     let tabId = await this.getOviceTabId();
-    chrome.tabs.reload(tabId);
+    if (tabId !== undefined) {
+      chrome.tabs.reload(tabId);
+    }
   }
 
   async activeOviceTab() {
@@ -82,17 +82,16 @@ class OviceTabManager {
   }
 
   isOviceTab(tab, oviceUrl) {
+    if (!oviceUrl || !tab.url) return false;
     let discarded = tab.discarded;
     let isOvice = tab.url.startsWith(oviceUrl);
     return !discarded && isOvice;
   }
-
 }
 
-class MessageManager {
-
-  constructor(oviceTabManager) {
-    this.oviceTabManager = oviceTabManager;
+class MessageService {
+  constructor(tabService) {
+    this.tabService = tabService;
   }
 
   sendCheckButtonMessage() {
@@ -104,10 +103,12 @@ class MessageManager {
   }
 
   sendMessageToOviceTab(message) {
-    this.oviceTabManager.getSpaceUrl().then((oviceUrl) => {
+    this.tabService.getSpaceUrl().then((oviceUrl) => {
+      if (!oviceUrl) return;
+      
       chrome.tabs.query({}, (tabs) => {
         for (const tab of tabs) {
-          if (this.oviceTabManager.isOviceTab(tab, oviceUrl)) {
+          if (this.tabService.isOviceTab(tab, oviceUrl)) {
             chrome.tabs.sendMessage(tab.id, message, (response) => {
               if (chrome.runtime.lastError) {
                 console.info(chrome.runtime.lastError.message);
@@ -119,11 +120,9 @@ class MessageManager {
       });
     });
   }
-
 }
 
-class IconManager {
-
+class IconComponent {
   constructor() {
     this.iconState = {
       isOn: false,
@@ -138,17 +137,17 @@ class IconManager {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0];
       if (activeTab) {
-        this.refresh(activeTab.id)
+        this.refresh(activeTab.id);
       }
     });
   }
   
   refresh(tabId) {
-    const iconPath =  this.iconState.isDisabled
+    const iconPath = this.iconState.isDisabled
       ? "../image/icon_disable.png"
-      :  this.iconState.isOn
-      ? "../image/icon_on.png"
-      : "../image/icon_off.png";
+      : this.iconState.isOn
+        ? "../image/icon_on.png"
+        : "../image/icon_off.png";
   
     chrome.action.setIcon({ tabId: tabId, path: iconPath });
   }
@@ -156,87 +155,97 @@ class IconManager {
   isStateOff() {
     return !this.iconState.isOn && !this.iconState.isDisabled;
   }
-
 }
 
-class EventListenerManager {
-
-  constructor(storageManager, oviceTabManager, messageManager, iconManager) {
-    this.storageManager = storageManager;
-    this.oviceTabManager = oviceTabManager;
-    this.messageManager = messageManager;
-    this.iconManager = iconManager;
+class AppController {
+  constructor(configStorage, tabService, messageService, iconComponent) {
+    this.configStorage = configStorage;
+    this.tabService = tabService;
+    this.messageService = messageService;
+    this.iconComponent = iconComponent;
   }
 
-  addEventListener() {
+  initialize() {
+    this.setupTabListeners();
+    this.setupCommandListeners();
+    this.setupRuntimeListeners();
+  }
 
+  setupTabListeners() {
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (changeInfo.status === "complete") {
-        this.requestCheckButton().then();
+        this.requestCheckButton();
       }
     });
     
     chrome.tabs.onActivated.addListener((activeInfo) => {
-      this.oviceTabManager.getSpaceUrl().then((oviceUrl) => {
+      this.tabService.getSpaceUrl().then((oviceUrl) => {
         chrome.tabs.get(activeInfo.tabId, (tab) => {
-          if (tab && !this.oviceTabManager.isOviceTab(tab, oviceUrl)) {
-            this.iconManager.refresh(activeInfo.tabId);
+          if (tab && !this.tabService.isOviceTab(tab, oviceUrl)) {
+            this.iconComponent.refresh(activeInfo.tabId);
           }
         });
       });
     });
     
-    chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+    chrome.tabs.onRemoved.addListener(() => {
       this.requestCheckButton();
     });
     
-    chrome.action.onClicked.addListener(async () => {
-      this.messageManager.sendClickButtonMessage();
-      this.oviceTabManager.activeOviceTab();
+    chrome.action.onClicked.addListener(() => {
+      this.messageService.sendClickButtonMessage();
+      this.tabService.activeOviceTab();
     });
+  }
 
-    chrome.commands.onCommand.addListener(async (command) => {
+  setupCommandListeners() {
+    chrome.commands.onCommand.addListener((command) => {
       if (command === "toggle-microphone") {
-        this.messageManager.sendClickButtonMessage();
+        this.messageService.sendClickButtonMessage();
       } else if (command === "toggle-microphone-and-active-tab") {
-        this.messageManager.sendClickButtonMessage();
-        this.oviceTabManager.activeOviceTab();
+        this.messageService.sendClickButtonMessage();
+        this.tabService.activeOviceTab();
       }
     });
-    
+  }
+
+  setupRuntimeListeners() {
     chrome.runtime.onInstalled.addListener((details) => {
       if (details.reason === 'install') {
         chrome.tabs.create({ url: '../html/options.html' });
       } else if (details.reason === 'update') {
-        this.storageManager.migration();
-        this.oviceTabManager.reloadOviceTabs();
+        this.configStorage.migration();
+        this.tabService.reloadOviceTabs();
       }
     });
     
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.message === 'update_icon') {
-        this.iconManager.update(request.isOn, request.disabled);
+        this.iconComponent.update(request.isOn, request.disabled);
       } else if (request.message === 'reload_ovice_tabs') {
-        this.oviceTabManager.reloadOviceTabs();
+        this.tabService.reloadOviceTabs();
       }
     });
-
   }
 
   async requestCheckButton() {
-    const hasOvice = await this.oviceTabManager.hasOviceTab();
+    const hasOvice = await this.tabService.hasOviceTab();
     if (hasOvice) {
-      this.messageManager.sendCheckButtonMessage();
+      this.messageService.sendCheckButtonMessage();
     } else {
-      this.iconManager.update(false, true);
+      this.iconComponent.update(false, true);
     }
   }
 }
 
-let storageManager = new StorageManager()
-let oviceTabManager = new OviceTabManager(storageManager);
-let messageManager = new MessageManager(oviceTabManager);
-let iconManager = new IconManager();
-let eventListenerManager = new EventListenerManager(storageManager, oviceTabManager, messageManager, iconManager);
+function initializeApp() {
+  const configStorage = new ConfigStorage();
+  const tabService = new TabService(configStorage);
+  const messageService = new MessageService(tabService);
+  const iconComponent = new IconComponent();
+  const appController = new AppController(configStorage, tabService, messageService, iconComponent);
 
-eventListenerManager.addEventListener();
+  appController.initialize();
+}
+
+initializeApp();

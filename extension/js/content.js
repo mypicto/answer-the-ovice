@@ -150,6 +150,5 @@ class AppInitializer {
   }
 }
 
-// アプリケーションを初期化
 MessageHandler.initialize();
 AppInitializer.initialize();
