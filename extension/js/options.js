@@ -50,39 +50,12 @@ class LocalizeManager {
     }
 }
 
-class StorageManager {
-
-  async getStorageData(keys) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.get(keys, (result) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-  
-  async setStorageData(items) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.set(items, () => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-}
-
 class InputManager {
 
   static DEFAULT_MICROPHONE_XPATH = '//*[@id="MenuBar"]/div[2]/div[1]/button';
 
-  constructor(storageManager) {
-    this.storageManager = storageManager;
+  constructor(configStorage) {
+    this.configStorage = configStorage;
     this.spaceUrlInput = document.getElementById('spaceUrl');
     this.microphoneXPathInput = document.getElementById('microphoneXPath');
   }
@@ -95,7 +68,7 @@ class InputManager {
   }
 
   async reload() {
-    let data = await storageManager.getStorageData(['spaceUrl', 'microphoneXPath']);
+    let data = await this.configStorage.getStorageData(['spaceUrl', 'microphoneXPath']);
 
     if (data.spaceUrl !== undefined) {
       this.spaceUrlInput.value = data.spaceUrl;
@@ -122,7 +95,7 @@ class InputManager {
     }
   
     event.preventDefault();
-    storageManager.setStorageData({
+    this.configStorage.setStorageData({
       'spaceUrl': spaceUrl,
       'microphoneXPath': microphoneXPath
     });
@@ -180,8 +153,8 @@ function validateMicrophoneXPath(xpath) {
 }
 
 let localizeManager = new LocalizeManager()
-let storageManager = new StorageManager()
-let inputManager = new InputManager(storageManager)
+let configStorage = new ConfigStorage()
+let inputManager = new InputManager(configStorage)
 document.addEventListener('DOMContentLoaded', () => {
   inputManager.init();
   localizeManager.init();

@@ -11,13 +11,17 @@
       "default_icon": "image/icon_disable.png"
     },
     "background": {
-      "service_worker": "js/background.js"
+      "service_worker": "js/background.js",
+      "type": "module"
     },
     "permissions": ["activeTab", "tabs", "storage"],
     "content_scripts": [
       {
         "matches": ["https://*.ovice.in/*", "https://app.rc.ovice.com/ws/*", "https://app.ovice.com/ws/*"],
-        "js": ["js/content.js"],
+        "js": [
+          "js/repositories/config-storage.js",
+          "js/content.js"
+        ],
         "run_at": "document_idle"
       }
     ],

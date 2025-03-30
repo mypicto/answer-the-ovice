@@ -1,36 +1,5 @@
-class ConfigStorage {
-  async migration() {
-    const data = await this.getStorageData(['spaceDomain', 'spaceUrl']);
-    if (data.spaceDomain && (!data.spaceUrl || data.spaceUrl === '')) {
-      const newSpaceUrl = `https://${data.spaceDomain}.ovice.in/`;
-      await this.setStorageData({ 'spaceUrl': newSpaceUrl });
-    }
-  }
-
-  async getStorageData(keys) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.get(keys, (result) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-  
-  async setStorageData(items) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.set(items, () => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-}
+import './repositories/config-storage.js';
+const { ConfigStorage } = globalThis;
 
 class TabService {
   constructor(configStorage) {
@@ -38,12 +7,7 @@ class TabService {
   }
 
   async getSpaceUrl() {
-    let data = await this.configStorage.getStorageData(['spaceUrl']);
-    if (data.spaceUrl) {
-      return data.spaceUrl;
-    } else {
-      return undefined;
-    }
+    return await this.configStorage.getSpaceUrl();
   }
 
   async reloadOviceTabs() {

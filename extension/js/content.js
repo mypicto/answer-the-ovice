@@ -24,36 +24,10 @@ class MessageHandler {
   }
 }
 
-class ConfigStorage {
-  static async getMicrophoneXPath() {
-    return new Promise((resolve) => {
-      if (chrome.runtime.lastError) {
-        resolve(undefined);
-        return;
-      }
-      
-      chrome.storage.sync.get("microphoneXPath", (data) => {
-        resolve(data.microphoneXPath);
-      });
-    });
-  }
-
-  static async getSpaceUrl() {
-    return new Promise((resolve) => {
-      chrome.storage.sync.get("spaceUrl", (data) => {
-        if (data.spaceUrl) {
-          resolve(data.spaceUrl);
-        } else {
-          resolve(undefined);
-        }
-      });
-    });
-  }
-}
-
 class MicrophoneButtonComponent {
   static async getButton() {
-    const xpath = await ConfigStorage.getMicrophoneXPath();
+    const configStorage = new ConfigStorage();
+    const xpath = await configStorage.getMicrophoneXPath();
     if (xpath) {
       return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     }
@@ -139,7 +113,8 @@ class MicrophoneController {
 
 class AppInitializer {
   static async initialize() {
-    const oviceUrl = await ConfigStorage.getSpaceUrl();
+    const configStorage = new ConfigStorage();
+    const oviceUrl = await configStorage.getSpaceUrl();
     if (oviceUrl && window.location.href.startsWith(oviceUrl)) {
       MicrophoneController.observeButton();
       MicrophoneController.checkStatus();
